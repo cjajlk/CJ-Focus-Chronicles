@@ -40,6 +40,22 @@ window.addEventListener('DOMContentLoaded', function() {
     const accordion = document.getElementById('badgesAccordion');
     if (accordion) accordion.removeAttribute('open');
   }
+    // --- Anti-cheat inactivité ---
+    let inactivityTimeout = null;
+    const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
+    function resetInactivityTimer() {
+      if (inactivityTimeout) clearTimeout(inactivityTimeout);
+      if (running) {
+        inactivityTimeout = setTimeout(() => {
+          triggerAntiCheat();
+          alertBox.textContent = "Session annulée : aucune activité détectée pendant 5 minutes.";
+          alertBox.style.display = 'block';
+        }, INACTIVITY_LIMIT);
+      }
+    }
+    ['mousemove', 'keydown', 'touchstart'].forEach(evt => {
+      document.addEventListener(evt, resetInactivityTimer);
+    });
   const timerDisplay = document.getElementById('timer');
   const minutesInput = document.getElementById('minutes');
   const startBtn = document.getElementById('startBtn');
@@ -58,6 +74,30 @@ window.addEventListener('DOMContentLoaded', function() {
   const copySuccess = document.getElementById('copySuccess');
   const mainContainer = document.getElementById('mainContainer');
 
+  // --- Wake Lock ---
+  let wakeLock = null;
+  async function requestWakeLock() {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        console.log('Wake Lock libéré');
+      });
+      console.log('Wake Lock activé');
+    } catch (err) {
+      console.warn('Wake Lock non disponible:', err);
+    }
+  }
+  async function releaseWakeLock() {
+    if (wakeLock) {
+      try {
+        await wakeLock.release();
+        wakeLock = null;
+        console.log('Wake Lock désactivé');
+      } catch (err) {
+        console.warn('Erreur lors de la libération du Wake Lock:', err);
+      }
+    }
+  }
   function updateTimerDisplay() {
     const min = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
     const sec = (remainingSeconds % 60).toString().padStart(2, '0');
@@ -65,12 +105,11 @@ window.addEventListener('DOMContentLoaded', function() {
     // Barre de progression circulaire
     const circle = document.getElementById('progressCircle');
     if (circle) {
-      const total = totalSeconds;
-      const progress = total - remainingSeconds;
       const r = 54;
       const c = 2 * Math.PI * r;
       circle.setAttribute('stroke-dasharray', c);
-      circle.setAttribute('stroke-dashoffset', c - (progress / total) * c);
+      // Barre qui se vide au fil du temps
+      circle.setAttribute('stroke-dashoffset', (remainingSeconds / totalSeconds) * c);
     }
   }
 
@@ -86,6 +125,7 @@ window.addEventListener('DOMContentLoaded', function() {
     antiCheatTriggered = false;
     lastQuest60 = false;
     lastQuest90 = false;
+      clearTimeout(inactivityTimeout); // Arrête le timer d'inactivité
   }
 
   function startTimer() {
@@ -104,6 +144,8 @@ window.addEventListener('DOMContentLoaded', function() {
         running = false;
         startBtn.disabled = false;
         miner.classList.remove('mining');
+        releaseWakeLock(); // Libération du Wake Lock
+        clearTimeout(inactivityTimeout); // Arrête le timer d'inactivité
         let questDuration = totalSeconds / 60;
         // --- Streak & badges ---
         if (!antiCheatTriggered) {
@@ -138,6 +180,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
   function showVictory(gain) {
     victory.style.display = 'flex';
+    // Déblocage du badge Premier Pas si session réussie sans triche
+    if (!antiCheatTriggered && resourceCount >= 1) {
+      userBadges['badge1'] = true;
+    }
     // Progression : update badges/rank
     updateProgression();
     // Ajout bouton copier succès
@@ -240,6 +286,23 @@ window.addEventListener('DOMContentLoaded', function() {
         span.style.boxShadow = '0 0 16px 4px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset';
         span.style.background = 'rgba(0,255,231,0.08)';
         span.classList.add('badge-shine');
+        // Ajout bouton partager
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'badge-share-btn';
+        shareBtn.innerText = 'Partager';
+        shareBtn.style.marginLeft = '0.5rem';
+        shareBtn.onclick = function() {
+          let txt = `🎖️ J'ai débloqué le badge "${badge.label}" sur CJ Focus Chronicles ! ${badge.icon} ${badge.tooltip} 🪙 https://cjajlk.github.io/cjajlkGames/`;
+          if (navigator.share) {
+            navigator.share({ title: 'CJ Focus Chronicles', text: txt, url: 'https://cjajlk.github.io/cjajlkGames/' });
+          } else {
+            navigator.clipboard.writeText(txt);
+            copySuccess.style.display = 'block';
+            copySuccess.innerText = 'Badge copié !';
+            setTimeout(()=>{copySuccess.style.display='none';}, 1800);
+          }
+        };
+        span.appendChild(shareBtn);
       } else {
         span.style.filter = 'grayscale(1) brightness(0.5)';
         span.style.boxShadow = 'none';

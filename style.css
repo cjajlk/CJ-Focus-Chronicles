@@ -198,6 +198,27 @@ h1 {
   transition: background 0.2s, color 0.2s;
 }
 .victory .victory-btn:hover {
+  /* Style bouton partager badge */
+  .badge-share-btn {
+    background: linear-gradient(90deg, var(--neon-color,#00ffe7) 0%, #00bfff 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.4rem 1.2rem !important;
+    font-size: 1rem !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 12px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset !important;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s !important;
+    margin-left: 0.5rem !important;
+    display: inline-block !important;
+  }
+  }
+  .badge-share-btn:hover {
+    background: linear-gradient(90deg, #00bfff 0%, var(--neon-color,#00ffe7) 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 0 18px var(--neon-color,#00ffe7) !important;
+  }
   background: linear-gradient(90deg, #00bfff 0%, #00ffe7 100%);
   color: #fff;
 }
@@ -230,28 +251,33 @@ h1 {
     height: 54px;
     margin-bottom: 0.2rem;
   }
-  .timer {
-    font-size: 0.95rem;
-  }
-  .miner {
+    margin-top: 1rem;
+    background: linear-gradient(90deg, var(--neon-color,#00ffe7) 0%, #00bfff 100%);
+    color: #181c24;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem 2.2rem;
     font-size: 1.1rem;
-    height: 1.2rem;
-    width: 1.2rem;
-    margin: 0.1rem 0 0.1rem 0;
-  }
-  .controls {
-    gap: 0.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 12px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    margin-right: 0.7rem;
+    display: inline-block;
     margin-bottom: 0.1rem;
   }
   .controls button {
-    font-size: 0.85rem;
-    padding: 0.25rem 0.4rem;
-    min-width: 0;
-  }
-  .controls input[type="number"] {
-    font-size: 0.85rem;
-    width: 28px;
-    padding: 0.1rem 0.01rem;
+      border: none;
+      border-radius: 10px;
+    background: linear-gradient(90deg, #00bfff 0%, var(--neon-color,#00ffe7) 100%);
+    color: #fff;
+    box-shadow: 0 0 18px var(--neon-color,#00ffe7);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 8px var(--neon-color,#00ffe7);
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      margin-right: 0.7rem;
+      display: inline-block;
   }
   .resources {
     font-size: 0.9rem;
