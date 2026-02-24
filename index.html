@@ -6,232 +6,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CJ Focus Chronicles</title>
   <link rel="stylesheet" href="style.css">
-          resourceDisplay.textContent = resourceCount;
-          // Animation ressource
-          resourceDisplay.animate([
-            { transform: 'scale(1)', color: '#fff' },
-            { transform: 'scale(1.4)', color: 'var(--neon-color,#ffd700)' },
-            { transform: 'scale(1)', color: '#fff' }
-          ], { duration: 600 });
-          // Victoire
-          showVictory(gain);
-        }
-      }, 1000);
-    }
 
-    function showVictory(gain) {
-      victory.style.display = 'flex';
-      // Audio supprimé pour éviter la distraction
-      // Progression : update badges/rank
-      updateProgression();
-      // Ajout bouton copier succès
-      if (!document.getElementById('copyBtn')) {
-        let btn = document.createElement('button');
-        btn.id = 'copyBtn';
-        btn.className = 'victory-btn';
-        btn.innerText = 'Copier mon succès';
-        btn.onclick = function() {
-          let txt = `🔥 J'ai réussi ${resourceCount} quêtes sur CJ Focus Chronicles ! Rang : ${ranks[userRank].name}${streak>=3?' (Streak X2!)':''} 🪙 https://cjajlk.github.io/cjajlkGames/`;
-          navigator.clipboard.writeText(txt);
-          copySuccess.style.display = 'block';
-          setTimeout(()=>{copySuccess.style.display='none';}, 1800);
-        };
-        victory.querySelector('.victory-inner').appendChild(btn);
-      }
-    }
-    victoryClose.addEventListener('click', () => {
-      victory.style.display = 'none';
-      resetTimer();
-    });
-
-    startBtn.addEventListener('click', () => {
-      resetTimer();
-      startTimer();
-    });
-
-    resetBtn.addEventListener('click', () => {
-      resetTimer();
-    });
-
-    minutesInput.addEventListener('change', () => {
-      if (!running) {
-        resetTimer();
-      }
-    });
-
-    // --- Anti-cheat ---
-    function triggerAntiCheat() {
-      if (running && !antiCheatTriggered) {
-        clearInterval(timerInterval);
-        running = false;
-        remainingSeconds = totalSeconds;
-        updateTimerDisplay();
-        alertBox.style.display = 'block';
-        startBtn.disabled = false;
-        miner.classList.remove('mining');
-        antiCheatTriggered = true;
-      }
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        triggerAntiCheat();
-      }
-    });
-    window.addEventListener('blur', () => {
-      triggerAntiCheat();
-    });
-
-    // --- Progression Logic ---
-    function getCurrentRankIdx(quests) {
-      let idx = 0;
-      for (let i = 0; i < ranks.length; i++) {
-        if (quests >= ranks[i].min) idx = i;
-      }
-      return idx;
-    }
-
-    function updateProgression() {
-      // Badges
-      for (const badge of badges) {
-        if (badge.check(resourceCount, streak, {lastQuest60, rank:userRank, kofi:kofiClicked})) {
-          userBadges[badge.id] = true;
-        }
-      }
-      saveProgression();
-      renderBadges();
-      // Rang
-      const prevRank = userRank;
-      userRank = getCurrentRankIdx(resourceCount);
-      renderRank();
-      if (userRank !== prevRank) {
-        showRankUpAnim();
-        updateNeonColor();
-      }
-      updateNeonColor();
-    }
-
-    function renderRank() {
-      rankTitle.textContent = `Rang : ${ranks[userRank].name}`;
-      rankIcon.textContent = ranks[userRank].icon;
-      rankIcon.style.color = ranks[userRank].color;
-    }
-
-    function renderBadges() {
-      badgesList.innerHTML = '';
-      for (const badge of badges) {
-        const earned = userBadges[badge.id];
-        const span = document.createElement('span');
-        span.setAttribute('tabindex', '0');
-        span.setAttribute('aria-label', badge.label);
-        span.style.fontSize = '2rem';
-        span.style.transition = 'filter 0.3s, box-shadow 0.3s';
-        span.textContent = badge.icon;
-        span.className = 'badge-ico';
-        if (earned) {
-          span.style.filter = 'none';
-          span.style.boxShadow = '0 0 16px 4px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset';
-          span.style.background = 'rgba(0,255,231,0.08)';
-          span.classList.add('badge-shine');
-        } else {
-          span.style.filter = 'grayscale(1) brightness(0.5)';
-          span.style.boxShadow = 'none';
-          span.style.background = 'none';
-        }
-        // Tooltip
-        span.addEventListener('mouseenter', function(e){
-          showTooltip(badge.tooltip, span);
-        });
-        span.addEventListener('mouseleave', hideTooltip);
-        span.addEventListener('focus', function(e){
-          showTooltip(badge.tooltip, span);
-        });
-        span.addEventListener('blur', hideTooltip);
-        badgesList.appendChild(span);
-      }
-    }
-
-    function saveProgression() {
-      localStorage.setItem('cjfc_badges', JSON.stringify(userBadges));
-      localStorage.setItem('cjfc_rank', userRank);
-      localStorage.setItem('cjfc_resources', resourceCount);
-      localStorage.setItem('cjfc_streak', streak);
-      localStorage.setItem('cjfc_lastQuest60', lastQuest60?'1':'');
-      localStorage.setItem('cjfc_kofi', kofiClicked?'1':'');
-    }
-
-    function loadProgression() {
-      try {
-        userBadges = JSON.parse(localStorage.getItem('cjfc_badges')) || {};
-        userRank = parseInt(localStorage.getItem('cjfc_rank'), 10) || 0;
-        resourceCount = parseInt(localStorage.getItem('cjfc_resources'), 10) || 0;
-        streak = parseInt(localStorage.getItem('cjfc_streak'), 10) || 0;
-        lastQuest60 = !!localStorage.getItem('cjfc_lastQuest60');
-        kofiClicked = !!localStorage.getItem('cjfc_kofi');
-        resourceDisplay.textContent = resourceCount;
-        if (streak >= 3) streakDisplay.style.display = 'inline';
-      } catch(e) {
-        userBadges = {};
-        userRank = 0;
-        streak = 0;
-        lastQuest60 = false;
-        kofiClicked = false;
-      }
-      renderRank();
-      renderBadges();
-      updateNeonColor();
-    }
-    // --- Neon color évolutive ---
-    function updateNeonColor() {
-      let color = ranks[userRank].color;
-      document.documentElement.style.setProperty('--neon-color', color);
-      mainContainer.style.boxShadow = `0 0 32px 4px ${color}, 0 0 0 2px ${color} inset`;
-      let h2 = document.querySelector('.badges-section h2');
-      if(h2) h2.style.color = color;
-    }
-
-    // --- Tooltip badges ---
-    let tooltipDiv = null;
-    function showTooltip(text, el) {
-      hideTooltip();
-      tooltipDiv = document.createElement('div');
-      tooltipDiv.className = 'badge-tooltip';
-      tooltipDiv.innerText = text;
-      document.body.appendChild(tooltipDiv);
-      let rect = el.getBoundingClientRect();
-      tooltipDiv.style.position = 'fixed';
-      tooltipDiv.style.left = (rect.left + rect.width/2 - 80) + 'px';
-      tooltipDiv.style.top = (rect.top - 38) + 'px';
-      tooltipDiv.style.minWidth = '160px';
-      tooltipDiv.style.background = 'rgba(24,28,36,0.98)';
-      tooltipDiv.style.color = 'var(--neon-color,#00ffe7)';
-      tooltipDiv.style.padding = '0.5rem 1rem';
-      tooltipDiv.style.borderRadius = '12px';
-      tooltipDiv.style.boxShadow = '0 0 12px var(--neon-color,#00ffe7)';
-      tooltipDiv.style.fontSize = '1rem';
-      tooltipDiv.style.textAlign = 'center';
-      tooltipDiv.style.zIndex = 4000;
-      tooltipDiv.style.pointerEvents = 'none';
-    }
-    function hideTooltip() {
-      if (tooltipDiv) { tooltipDiv.remove(); tooltipDiv = null; }
-    }
-    // --- Badge Ko-fi ---
-    kofiBtn.addEventListener('click', function() {
-      kofiClicked = true;
-      updateProgression();
-    });
-
-    function showRankUpAnim() {
-      rankUpAnim.innerHTML = `<div style='display:flex;flex-direction:column;align-items:center;justify-content:center;'><div style='font-size:3.5rem;text-shadow:0 0 24px #00ffe7;'>${ranks[userRank].icon}</div><div style='color:${ranks[userRank].color};font-size:2.2rem;font-weight:bold;text-shadow:0 0 16px #00ffe7;margin-top:1rem;'>Nouveau rang : ${ranks[userRank].name} !</div></div>`;
-      rankUpAnim.style.display = 'flex';
-      setTimeout(() => { rankUpAnim.style.display = 'none'; }, 2200);
-    }
-
-    // --- Initialisation ---
-    loadProgression();
-    resetTimer();
-    </script>
-  </script>
+</head>
+<body>
+  <div id="mainContainer" class="container">
+    <h1>Focus Chronicles</h1>
+    <div class="timer-progress">
+      <svg width="120" height="120">
+        <circle cx="60" cy="60" r="54" stroke="#222" stroke-width="8" fill="none"/>
+        <circle id="progressCircle" cx="60" cy="60" r="54" stroke="#00ffe7" stroke-width="8" fill="none" stroke-linecap="round" style="transition:stroke-dashoffset 0.5s;"/>
+      </svg>
+      <div id="timer" class="timer">25:00</div>
+    </div>
+    <div class="controls">
+      <input id="minutes" type="number" min="1" max="120" value="25" step="1" aria-label="Durée (minutes)" />
+      <button id="startBtn">Démarrer</button>
+      <button id="resetBtn">Réinitialiser</button>
+    </div>
+    <div id="alert" class="alert" style="display:none;">⚠️ Ne quitte pas la page pendant ta session !</div>
+    <div class="resources">
+      <span class="resource-label">Ressources :</span>
+      <span id="resourceCount">0</span>
+      <span id="streak" class="streak" style="display:none;">🔥 Streak X2 !</span>
+    </div>
+    <div id="miner" class="miner">⛏️</div>
+    <div class="badges-section">
+      <details id="badgesAccordion" open>
+        <summary>🎖️ Badges</summary>
+        <div id="badgesList" class="badges-list"></div>
+      </details>
+    </div>
+    <div class="rank-section">
+      <span id="rankIcon" class="rank-icon">🥉</span>
+      <span id="rankTitle" class="rank-title">Rang : Novice</span>
+    </div>
+    <a id="kofiBtn" class="kofi-btn" title="Soutenir sur Ko-fi" href="https://ko-fi.com/cjajlk" target="_blank" rel="noopener">☕ Ko-fi</a>
+  </div>
+  <div id="victory" class="victory-modal" style="display:none;">
+    <div class="victory-inner">
+      <div class="victory-title">Session terminée !</div>
+      <div class="victory-content">Bravo, tu as gagné des ressources !</div>
+      <button id="victoryClose" class="victory-btn">Fermer</button>
+      <div id="copySuccess" class="copy-success" style="display:none;">Succès copié !</div>
+    </div>
+  </div>
+  <div id="rankUpAnim" class="rankup-anim" style="display:none;"></div>
+  <a class="hub-link" href="https://cjajlk.github.io/cjajlkGames/" target="_blank" rel="noopener">🌐 Voir tous mes jeux</a>
+  <script src="script.js"></script>
 </body>
 </html>

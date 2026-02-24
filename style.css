@@ -211,12 +211,12 @@ h1 {
   }
   .container {
     max-width: 100vw;
-    width: 100vw;
+    
     padding: 0.2rem 0.1rem 0.3rem 0.1rem;
     border-radius: 10px;
     box-shadow: 0 0 8px 1px var(--neon-color,#00ffe7), 0 0 0 1px var(--neon-color,#00ffe7) inset;
     margin: 0 auto;
-    gap: 0.7rem;
+    
   }
   h1 {
     font-size: 1rem;
@@ -267,46 +267,58 @@ h1 {
   .badges-section {
     margin: 0.2rem 0 0 0;
   }
-  .badges-section h2 {
-    font-size: 0.85rem !important;
-    margin: 0.1rem 0 0.1rem 0 !important;
-  }
   #badgesAccordion {
     width: 100%;
     margin: 0.1rem 0 0.2rem 0;
-  }
-  #badgesAccordion[open] {
-    background: rgba(24,28,36,0.98);
     border-radius: 8px;
+    background: rgba(24,28,36,0.98);
     box-shadow: 0 0 8px var(--neon-color,#00ffe7) inset;
-    padding-bottom: 0.2rem;
+    overflow: hidden;
   }
   #badgesAccordion summary {
     font-size: 1rem !important;
-    padding: 0.3rem 0.2rem;
+    padding: 0.5rem 0.2rem;
     outline: none;
     cursor: pointer;
     border-radius: 8px;
     background: none;
     user-select: none;
     text-align: center;
+    color: var(--neon-color,#00ffe7);
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #222a;
+    transition: background 0.2s;
+  }
+  #badgesAccordion[open] summary {
+    background: rgba(0,255,231,0.07);
   }
   .badges-list {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 0.6rem !important;
-    justify-content: center !important;
-    align-items: center !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: center;
+    align-items: center;
     padding: 0.3rem 0.1rem 0.2rem 0.1rem;
     min-height: 2.2rem;
     max-width: 98vw;
     margin: 0 auto;
-  }
-  #badgesAccordion[open] .badges-list {
-    display: flex !important;
+    transition: max-height 0.3s;
   }
   #badgesAccordion:not([open]) .badges-list {
-    display: none !important;
+    display: none;
+  }
+  .badge-ico {
+    font-size: 2rem;
+    border-radius: 8px;
+    padding: 0.2rem;
+    background: none;
+    transition: filter 0.3s, box-shadow 0.3s, background 0.2s;
+    touch-action: manipulation;
+  }
+  .badge-ico:active {
+    background: rgba(0,255,231,0.08);
+    filter: brightness(1.2);
   }
   .kofi-btn {
     font-size: 0.85rem;
