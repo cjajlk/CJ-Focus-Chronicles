@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CJ Focus Chronicles</title>
+  <style>
+    body {
+      background: #181c24;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+    .container {
+      background: rgba(24,28,36,0.95);
+      border-radius: 20px;
+      box-shadow: 0 0 32px 4px #00ffe7, 0 0 0 2px #00ffe7 inset;
+      padding: 2.5rem 2rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      max-width: 350px;
+      width: 95vw;
+    }
+    h1 {
+      font-size: 2.2rem;
+      color: #00ffe7;
+      text-shadow: 0 0 8px #00ffe7, 0 0 2px #fff;
+      margin-bottom: 0.5rem;
+    }
+    .timer {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 0 12px #00ffe7, 0 0 2px #fff;
+      margin-bottom: 0.5rem;
+    }
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .controls input[type="number"] {
+      width: 60px;
+      padding: 0.3rem;
+      border-radius: 8px;
+      border: none;
+      background: #23283a;
+      color: #00ffe7;
+      font-size: 1.1rem;
+      outline: none;
+      box-shadow: 0 0 4px #00ffe7 inset;
+      text-align: center;
+    }
+    .controls button {
+      background: linear-gradient(90deg, #00ffe7 0%, #00bfff 100%);
+      color: #181c24;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1.2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00ffe7;
+      transition: background 0.2s, color 0.2s;
+    }
+    .controls button:hover {
+      background: linear-gradient(90deg, #00bfff 0%, #00ffe7 100%);
+      color: #fff;
+    }
+    .miner {
+      font-size: 3.5rem;
+      margin: 0.5rem 0 0.5rem 0;
+      filter: drop-shadow(0 0 12px #00ffe7);
+      transition: transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 4.5rem;
+      width: 4.5rem;
+      user-select: none;
+    }
+    .miner.mining {
+      animation: miningAnim 0.5s infinite alternate;
+    }
+    @keyframes miningAnim {
+      0% { transform: rotate(-18deg) scale(1.08); }
+      100% { transform: rotate(18deg) scale(1.18); }
+    }
+    /* Styles diamants supprimés */
+    .resources {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.3rem;
+      color: #fff;
+      text-shadow: 0 0 8px #ffb347;
+    }
+    .resource-icon {
+      font-size: 1.5rem;
+      color: #ffb347;
+      filter: drop-shadow(0 0 6px #ffb347);
+    }
+    .kofi-btn {
+      margin-top: 1.5rem;
+      display: block;
+      background: linear-gradient(90deg, #ff5f5f 0%, #ffb347 100%);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 1rem 0;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 0 16px #ff5f5f;
+      transition: background 0.2s, box-shadow 0.2s;
+      letter-spacing: 1px;
+      width: 100%;
+      text-align: center;
+      max-width: 350px;
+    }
+    .kofi-btn:hover {
+      background: linear-gradient(90deg, #ffb347 0%, #ff5f5f 100%);
+      box-shadow: 0 0 24px #ffb347;
+    }
+    .alert {
+      color: #ff5f5f;
+      font-weight: bold;
+      margin-top: 1rem;
+      text-shadow: 0 0 8px #ff5f5f;
+      display: none;
+    }
+    .victory {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(24,28,36,0.98);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: #fff;
+      font-size: 2.2rem;
+      text-shadow: 0 0 16px #00ffe7, 0 0 2px #fff;
+      animation: popin 0.5s;
+    }
+    @keyframes popin {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .victory .victory-inner {
+      background: rgba(24,28,36,0.98);
+      border-radius: 24px;
+      box-shadow: 0 0 32px 4px #00ffe7, 0 0 0 2px #00ffe7 inset;
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .victory .victory-title {
+      color: #ffb347;
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-shadow: 0 0 16px #ffb347, 0 0 2px #fff;
+    }
+    .victory .victory-btn {
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #00ffe7 0%, #00bfff 100%);
+      color: #181c24;
+      border: none;
+      border-radius: 10px;
+      padding: 0.7rem 2.2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00ffe7;
+      transition: background 0.2s, color 0.2s;
+    }
+    .victory .victory-btn:hover {
+      background: linear-gradient(90deg, #00bfff 0%, #00ffe7 100%);
+      color: #fff;
+    }
+    @media (max-width: 600px) {
+      .container {
+        max-width: 98vw;
+        padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+      }
+      .kofi-btn {
+        font-size: 1.2rem;
+        padding: 1.2rem 0;
+        border-radius: 16px;
+        max-width: 100vw;
+      }
+      .miner {
+        font-size: 2.5rem;
+        height: 3.2rem;
+        width: 3.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+      <h1>CJ Focus Chronicles</h1>
+      <div class="miner" id="miner">⛏️</div>
+      <div class="timer" id="timer">25:00</div>
+      <div class="controls">
+        <input type="number" id="minutes" min="1" max="120" value="25"> min
+        <button id="startBtn">Démarrer</button>
+        <button id="resetBtn">Réinitialiser</button>
+      </div>
+      <!-- Section diamants/CJ supprimée -->
+      <div class="resources">
+        <span class="resource-icon">🪙</span>
+        <span id="resourceCount">0</span> Ressources
+        <span id="streak" style="margin-left:1rem;font-size:1.1rem;color:#ffd700;text-shadow:0 0 8px #ffd700;display:none;">🔥 X2</span>
+      </div>
+      <div class="rank-section" id="rankSection">
+        <span id="rankTitle">Rang : Novice</span>
+        <span id="rankIcon" style="font-size:1.5rem;margin-left:0.5rem;">🥉</span>
+      </div>
+      <a class="kofi-btn" id="kofiBtn" href="https://ko-fi.com/cjajlk" target="_blank">☕ Faire un don sur Ko-fi</a>
+      <div class="alert" id="alert">⚠️ Ne quittez pas l'onglet ou l'application ! Le timer est remis à zéro.</div>
+      <div class="badges-section" id="badgesSection">
+        <h2 style="font-size:1.1rem;color:var(--neon-color,#00ffe7);text-shadow:0 0 8px var(--neon-color,#00ffe7);margin:1.5rem 0 0.5rem 0;">Mes Badges</h2>
+        <div id="badgesList" style="display:flex;gap:1.2rem;justify-content:center;align-items:center;"></div>
+      </div>
+      <a class="hub-link" href="https://cjajlk.github.io/cjajlkGames/" target="_blank">🎮 Découvrir le portail de jeux CJ</a>
+    </div>
+  </div>
+  <div class="victory" id="victory">
+    <div class="victory-inner">
+      <div class="victory-title">QUÊTE RÉUSSIE !</div>
+      <div style="font-size:2.5rem;">🎉</div>
+      <button class="victory-btn" id="victoryClose">Continuer</button>
+    </div>
+  </div>
+  <audio id="coinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9bfae2.mp3" preload="auto"></audio>
+  <div id="rankUpAnim" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;align-items:center;justify-content:center;background:rgba(24,28,36,0.96);flex-direction:column;"></div>
+  <div id="copySuccess" style="display:none;position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:1rem 2rem;border-radius:16px;box-shadow:0 0 16px #00ffe7;font-size:1.1rem;z-index:3000;text-align:center;">Succès copié !</div>
+  <script>
+    // --- Timer Logic ---
+    let timerInterval = null;
+    let totalSeconds = 1500;
+    let remainingSeconds = 1500;
+    let running = false;
+    // Suppression de diamondCount (plus de CJ/diamant)
+    let resourceCount = 0;
+    let antiCheatTriggered = false;
+
+    // --- Progression & Badges ---
+    const ranks = [
+      { name: "Novice", min: 0, icon: "🥉", color: "#00ffe7" },
+      { name: "Apprenti", min: 5, icon: "🥈", color: "#a259ff" },
+      { name: "Aventurier", min: 15, icon: "🥇", color: "#ffd700" },
+      { name: "Maître", min: 30, icon: "🏆", color: "#ffb347" },
+      { name: "Légende", min: 60, icon: "👑", color: "#ffd700" }
+    ];
+    // Badges spécifiques demandés
+    const badges = [
+      { id: "badge1", label: "Premier Pas", icon: "🌱", tooltip: "Terminer sa toute première session de focus.", check: (r, s) => r >= 1 },
+      { id: "badgeStreak", label: "Série de Feu", icon: "🔥", tooltip: "Réussir 3 sessions de focus d'affilée sans aucune triche.", check: (r, s) => s >= 3 },
+      { id: "badge60min", label: "L'Indestructible", icon: "🛡️", tooltip: "Finir une quête de 60 minutes sans quitter l'écran une seule fois.", check: (r, s, l) => l.lastQuest60 },
+      { id: "badgeLegend", label: "Légende de CJ", icon: "👑", tooltip: "Atteindre le rang maximum de progression.", check: (r, s, l) => l.rank === ranks.length - 1 },
+      { id: "badgeKofi", label: "Soutien Élite", icon: "☕", tooltip: "Cliquer sur le bouton Ko-fi pour soutenir le créateur.", check: (r, s, l) => l.kofi },
+    ];
+    let userBadges = {};
+    let userRank = 0;
+    let streak = 0;
+    let lastQuest60 = false;
+    let kofiClicked = false;
+
+    const timerDisplay = document.getElementById('timer');
+    const minutesInput = document.getElementById('minutes');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    // Suppression de diamondDisplay (plus de CJ/diamant)
+    const resourceDisplay = document.getElementById('resourceCount');
+    const alertBox = document.getElementById('alert');
+    const miner = document.getElementById('miner');
+    const victory = document.getElementById('victory');
+    const victoryClose = document.getElementById('victoryClose');
+    const coinSound = document.getElementById('coinSound');
+    const rankTitle = document.getElementById('rankTitle');
+    const rankIcon = document.getElementById('rankIcon');
+    const badgesList = document.getElementById('badgesList');
+    const rankUpAnim = document.getElementById('rankUpAnim');
+    const streakDisplay = document.getElementById('streak');
+    const kofiBtn = document.getElementById('kofiBtn');
+    const copySuccess = document.getElementById('copySuccess');
+    const mainContainer = document.getElementById('mainContainer');
+
+    function updateTimerDisplay() {
+      const min = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
+      const sec = (remainingSeconds % 60).toString().padStart(2, '0');
+      timerDisplay.textContent = `${min}:${sec}`;
+    }
+
+    function resetTimer(keepDiamonds = true) {
+      running = false;
+      clearInterval(timerInterval);
+      totalSeconds = parseInt(minutesInput.value, 10) * 60;
+      remainingSeconds = totalSeconds;
+      updateTimerDisplay();
+      startBtn.disabled = false;
+      miner.classList.remove('mining');
+      alertBox.style.display = 'none';
+      antiCheatTriggered = false;
+      lastQuest60 = false;
+    }
+
+    function startTimer() {
+      if (running) return;
+      running = true;
+      startBtn.disabled = true;
+      alertBox.style.display = 'none';
+      antiCheatTriggered = false;
+      miner.classList.add('mining');
+      timerInterval = setInterval(() => {
+        if (remainingSeconds > 0) {
+          remainingSeconds--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timerInterval);
+          running = false;
+          startBtn.disabled = false;
+          miner.classList.remove('mining');
+          let questDuration = totalSeconds / 60;
+          // --- Streak & badges ---
+          if (!antiCheatTriggered) {
+            streak++;
+            if (streak >= 3) streakDisplay.style.display = 'inline';
+          } else {
+            streak = 0;
+            streakDisplay.style.display = 'none';
+          }
+          // Badge 60min
+          if (!antiCheatTriggered && questDuration >= 60) lastQuest60 = true;
+          else lastQuest60 = false;
+          // Gain ressources (X2 si streak)
+          let gain = 1;
+          if (streak >= 3) gain = 2;
+          resourceCount += gain;
+          resourceDisplay.textContent = resourceCount;
+          // Animation ressource
+          resourceDisplay.animate([
+            { transform: 'scale(1)', color: '#fff' },
+            { transform: 'scale(1.4)', color: 'var(--neon-color,#ffd700)' },
+            { transform: 'scale(1)', color: '#fff' }
+          ], { duration: 600 });
+          // Victoire
+          showVictory(gain);
+        }
+      }, 1000);
+    }
+
+    function showVictory(gain) {
+      victory.style.display = 'flex';
+      try { coinSound.currentTime = 0; coinSound.play(); } catch(e) {}
+      // Progression : update badges/rank
+      updateProgression();
+      // Ajout bouton copier succès
+      if (!document.getElementById('copyBtn')) {
+        let btn = document.createElement('button');
+        btn.id = 'copyBtn';
+        btn.className = 'victory-btn';
+        btn.innerText = 'Copier mon succès';
+        btn.onclick = function() {
+          let txt = `🔥 J'ai réussi ${resourceCount} quêtes sur CJ Focus Chronicles ! Rang : ${ranks[userRank].name}${streak>=3?' (Streak X2!)':''} 🪙 https://cjajlk.github.io/cjajlkGames/`;
+          navigator.clipboard.writeText(txt);
+          copySuccess.style.display = 'block';
+          setTimeout(()=>{copySuccess.style.display='none';}, 1800);
+        };
+        victory.querySelector('.victory-inner').appendChild(btn);
+      }
+    }
+    victoryClose.addEventListener('click', () => {
+      victory.style.display = 'none';
+      resetTimer();
+    });
+
+    startBtn.addEventListener('click', () => {
+      resetTimer();
+      startTimer();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      resetTimer();
+    });
+
+    minutesInput.addEventListener('change', () => {
+      if (!running) {
+        resetTimer();
+      }
+    });
+
+    // --- Anti-cheat ---
+    function triggerAntiCheat() {
+      if (running && !antiCheatTriggered) {
+        clearInterval(timerInterval);
+        running = false;
+        remainingSeconds = totalSeconds;
+        updateTimerDisplay();
+        alertBox.style.display = 'block';
+        startBtn.disabled = false;
+        miner.classList.remove('mining');
+        antiCheatTriggered = true;
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        triggerAntiCheat();
+      }
+    });
+    window.addEventListener('blur', () => {
+      triggerAntiCheat();
+    });
+
+    // --- Progression Logic ---
+    function getCurrentRankIdx(quests) {
+      let idx = 0;
+      for (let i = 0; i < ranks.length; i++) {
+        if (quests >= ranks[i].min) idx = i;
+      }
+      return idx;
+    }
+
+    function updateProgression() {
+      // Badges
+      for (const badge of badges) {
+        if (badge.check(resourceCount, streak, {lastQuest60, rank:userRank, kofi:kofiClicked})) {
+          userBadges[badge.id] = true;
+        }
+      }
+      saveProgression();
+      renderBadges();
+      // Rang
+      const prevRank = userRank;
+      userRank = getCurrentRankIdx(resourceCount);
+      renderRank();
+      if (userRank !== prevRank) {
+        showRankUpAnim();
+        updateNeonColor();
+      }
+      updateNeonColor();
+    }
+
+    function renderRank() {
+      rankTitle.textContent = `Rang : ${ranks[userRank].name}`;
+      rankIcon.textContent = ranks[userRank].icon;
+      rankIcon.style.color = ranks[userRank].color;
+    }
+
+    function renderBadges() {
+      badgesList.innerHTML = '';
+      for (const badge of badges) {
+        const earned = userBadges[badge.id];
+        const span = document.createElement('span');
+        span.setAttribute('tabindex', '0');
+        span.setAttribute('aria-label', badge.label);
+        span.style.fontSize = '2rem';
+        span.style.transition = 'filter 0.3s, box-shadow 0.3s';
+        span.textContent = badge.icon;
+        span.className = 'badge-ico';
+        if (earned) {
+          span.style.filter = 'none';
+          span.style.boxShadow = '0 0 16px 4px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset';
+          span.style.background = 'rgba(0,255,231,0.08)';
+          span.classList.add('badge-shine');
+        } else {
+          span.style.filter = 'grayscale(1) brightness(0.5)';
+          span.style.boxShadow = 'none';
+          span.style.background = 'none';
+        }
+        // Tooltip
+        span.addEventListener('mouseenter', function(e){
+          showTooltip(badge.tooltip, span);
+        });
+        span.addEventListener('mouseleave', hideTooltip);
+        span.addEventListener('focus', function(e){
+          showTooltip(badge.tooltip, span);
+        });
+        span.addEventListener('blur', hideTooltip);
+        badgesList.appendChild(span);
+      }
+    }
+
+    function saveProgression() {
+      localStorage.setItem('cjfc_badges', JSON.stringify(userBadges));
+      localStorage.setItem('cjfc_rank', userRank);
+      localStorage.setItem('cjfc_resources', resourceCount);
+      localStorage.setItem('cjfc_streak', streak);
+      localStorage.setItem('cjfc_lastQuest60', lastQuest60?'1':'');
+      localStorage.setItem('cjfc_kofi', kofiClicked?'1':'');
+    }
+
+    function loadProgression() {
+      try {
+        userBadges = JSON.parse(localStorage.getItem('cjfc_badges')) || {};
+        userRank = parseInt(localStorage.getItem('cjfc_rank'), 10) || 0;
+        resourceCount = parseInt(localStorage.getItem('cjfc_resources'), 10) || 0;
+        streak = parseInt(localStorage.getItem('cjfc_streak'), 10) || 0;
+        lastQuest60 = !!localStorage.getItem('cjfc_lastQuest60');
+        kofiClicked = !!localStorage.getItem('cjfc_kofi');
+        resourceDisplay.textContent = resourceCount;
+        if (streak >= 3) streakDisplay.style.display = 'inline';
+      } catch(e) {
+        userBadges = {};
+        userRank = 0;
+        streak = 0;
+        lastQuest60 = false;
+        kofiClicked = false;
+      }
+      renderRank();
+      renderBadges();
+      updateNeonColor();
+    }
+    // --- Neon color évolutive ---
+    function updateNeonColor() {
+      let color = ranks[userRank].color;
+      document.documentElement.style.setProperty('--neon-color', color);
+      mainContainer.style.boxShadow = `0 0 32px 4px ${color}, 0 0 0 2px ${color} inset`;
+      let h2 = document.querySelector('.badges-section h2');
+      if(h2) h2.style.color = color;
+    }
+
+    // --- Tooltip badges ---
+    let tooltipDiv = null;
+    function showTooltip(text, el) {
+      hideTooltip();
+      tooltipDiv = document.createElement('div');
+      tooltipDiv.className = 'badge-tooltip';
+      tooltipDiv.innerText = text;
+      document.body.appendChild(tooltipDiv);
+      let rect = el.getBoundingClientRect();
+      tooltipDiv.style.position = 'fixed';
+      tooltipDiv.style.left = (rect.left + rect.width/2 - 80) + 'px';
+      tooltipDiv.style.top = (rect.top - 38) + 'px';
+      tooltipDiv.style.minWidth = '160px';
+      tooltipDiv.style.background = 'rgba(24,28,36,0.98)';
+      tooltipDiv.style.color = 'var(--neon-color,#00ffe7)';
+      tooltipDiv.style.padding = '0.5rem 1rem';
+      tooltipDiv.style.borderRadius = '12px';
+      tooltipDiv.style.boxShadow = '0 0 12px var(--neon-color,#00ffe7)';
+      tooltipDiv.style.fontSize = '1rem';
+      tooltipDiv.style.textAlign = 'center';
+      tooltipDiv.style.zIndex = 4000;
+      tooltipDiv.style.pointerEvents = 'none';
+    }
+    function hideTooltip() {
+      if (tooltipDiv) { tooltipDiv.remove(); tooltipDiv = null; }
+    }
+    // --- Badge Ko-fi ---
+    kofiBtn.addEventListener('click', function() {
+      kofiClicked = true;
+      updateProgression();
+    });
+
+    function showRankUpAnim() {
+      rankUpAnim.innerHTML = `<div style='display:flex;flex-direction:column;align-items:center;justify-content:center;'><div style='font-size:3.5rem;text-shadow:0 0 24px #00ffe7;'>${ranks[userRank].icon}</div><div style='color:${ranks[userRank].color};font-size:2.2rem;font-weight:bold;text-shadow:0 0 16px #00ffe7;margin-top:1rem;'>Nouveau rang : ${ranks[userRank].name} !</div></div>`;
+      rankUpAnim.style.display = 'flex';
+      setTimeout(() => { rankUpAnim.style.display = 'none'; }, 2200);
+    }
+
+    // --- Initialisation ---
+    loadProgression();
+    resetTimer();
+    </script>
+    <style>
+      :root {
+        --neon-color: #00ffe7;
+      }
+      .badge-shine {
+        animation: shine 1.2s infinite alternate;
+      }
+      @keyframes shine {
+        0% { filter: drop-shadow(0 0 8px var(--neon-color,#00ffe7)); }
+        100% { filter: drop-shadow(0 0 24px var(--neon-color,#00ffe7)); }
+      }
+      .badge-tooltip {
+        pointer-events: none;
+        user-select: none;
+        opacity: 0.98;
+        transition: opacity 0.2s;
+      }
+      .hub-link {
+        display: block;
+        margin: 2.2rem auto 0 auto;
+        color: var(--neon-color,#00ffe7);
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-align: center;
+        text-decoration: none;
+        text-shadow: 0 0 8px var(--neon-color,#00ffe7);
+        border-radius: 10px;
+        padding: 0.7rem 0;
+        transition: background 0.2s, color 0.2s;
+        background: rgba(0,255,231,0.07);
+        box-shadow: 0 0 8px var(--neon-color,#00ffe7) inset;
+        max-width: 350px;
+      }
+      .hub-link:hover {
+        background: var(--neon-color,#00ffe7);
+        color: #181c24;
+        box-shadow: 0 0 24px var(--neon-color,#00ffe7);
+      }
+    </style>
+  </script>
+</body>
+</html>
