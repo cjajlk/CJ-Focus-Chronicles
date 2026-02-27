@@ -35,27 +35,56 @@ let kofiClicked = false;
 
 // --- Sélecteurs DOM ---
 window.addEventListener('DOMContentLoaded', function() {
+      // Info bulle sauvegarde locale
+      const infoIcon = document.getElementById('infoIcon');
+      const infoPopup = document.getElementById('infoPopup');
+      if (infoIcon && infoPopup) {
+        infoIcon.addEventListener('click', function(e) {
+          e.stopPropagation();
+          infoPopup.style.display = (infoPopup.style.display === 'none' || infoPopup.style.display === '') ? 'block' : 'none';
+        });
+        infoPopup.addEventListener('click', function(e) {
+          e.stopPropagation(); // Ne pas fermer si on clique dans la bulle
+        });
+        document.addEventListener('click', function() {
+          infoPopup.style.display = 'none';
+        });
+      }
+    // Overlay de verrouillage
+    const lockOverlay = document.getElementById('lockOverlay');
+    const unlockBtn = document.getElementById('unlockBtn');
+    if (unlockBtn) {
+      unlockBtn.addEventListener('click', function() {
+        stopSessionAndLose();
+      });
+    }
+
+    function showLockOverlay() {
+      if (lockOverlay) lockOverlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function hideLockOverlay() {
+      if (lockOverlay) lockOverlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    function stopSessionAndLose() {
+      running = false;
+      clearInterval(timerInterval);
+      releaseWakeLock();
+      hideLockOverlay();
+      alertBox.textContent = "Session annulée : écran débloqué avant la fin.";
+      alertBox.style.display = 'block';
+      streak = 0;
+      streakDisplay.style.display = 'none';
+      miner.classList.remove('mining');
+      startBtn.disabled = false;
+    }
   // Fermer le menu badges par défaut sur mobile
   if (window.innerWidth <= 600) {
     const accordion = document.getElementById('badgesAccordion');
     if (accordion) accordion.removeAttribute('open');
   }
-    // --- Anti-cheat inactivité ---
-    let inactivityTimeout = null;
-    const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 minutes
-    function resetInactivityTimer() {
-      if (inactivityTimeout) clearTimeout(inactivityTimeout);
-      if (running) {
-        inactivityTimeout = setTimeout(() => {
-          triggerAntiCheat();
-          alertBox.textContent = "Session annulée : aucune activité détectée pendant 5 minutes.";
-          alertBox.style.display = 'block';
-        }, INACTIVITY_LIMIT);
-      }
-    }
-    ['mousemove', 'keydown', 'touchstart'].forEach(evt => {
-      document.addEventListener(evt, resetInactivityTimer);
-    });
+    // Suppression du système anti-inactivité : la session continue même sans interaction utilisateur.
   const timerDisplay = document.getElementById('timer');
   const minutesInput = document.getElementById('minutes');
   const startBtn = document.getElementById('startBtn');
@@ -125,7 +154,7 @@ window.addEventListener('DOMContentLoaded', function() {
     antiCheatTriggered = false;
     lastQuest60 = false;
     lastQuest90 = false;
-      clearTimeout(inactivityTimeout); // Arrête le timer d'inactivité
+      // (anti-inactivité supprimé, rien à arrêter ici)
   }
 
   function startTimer() {
@@ -137,55 +166,56 @@ window.addEventListener('DOMContentLoaded', function() {
     miner.classList.add('mining');
     timerInterval = setInterval(() => {
       if (remainingSeconds > 0) {
-        remainingSeconds--;
-        updateTimerDisplay();
-      } else {
-        clearInterval(timerInterval);
-        running = false;
-        startBtn.disabled = false;
-        miner.classList.remove('mining');
-        releaseWakeLock(); // Libération du Wake Lock
-        clearTimeout(inactivityTimeout); // Arrête le timer d'inactivité
-        let questDuration = totalSeconds / 60;
-        // --- Streak & badges ---
-        if (!antiCheatTriggered) {
-          streak++;
-          if (streak >= 3) streakDisplay.style.display = 'inline';
-        } else {
-          streak = 0;
-          streakDisplay.style.display = 'none';
-        }
-        // Badge 60min
-        if (!antiCheatTriggered && questDuration >= 60) lastQuest60 = true;
-        else lastQuest60 = false;
-        // Badge 90min
-        if (!antiCheatTriggered && questDuration >= 90) lastQuest90 = true;
-        else lastQuest90 = false;
-        // Gain ressources (X2 si streak)
-        let gain = 1;
-        if (streak >= 3) gain = 2;
-        resourceCount += gain;
-        resourceDisplay.textContent = resourceCount;
-        // Animation ressource
-        resourceDisplay.animate([
-          { transform: 'scale(1)', color: '#fff' },
-          { transform: 'scale(1.4)', color: 'var(--neon-color,#ffd700)' },
-          { transform: 'scale(1)', color: '#fff' }
-        ], { duration: 600 });
-        // Victoire
-        showVictory(gain);
+        if (running) return;
+        running = true;
+        startBtn.disabled = true;
+        alertBox.style.display = 'none';
+        antiCheatTriggered = false;
+        miner.classList.add('mining');
+        showLockOverlay();
+        timerInterval = setInterval(() => {
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            running = false;
+            startBtn.disabled = false;
+            miner.classList.remove('mining');
+            releaseWakeLock();
+            hideLockOverlay();
+            let questDuration = totalSeconds / 60;
+            // --- Streak & badges ---
+            if (!antiCheatTriggered) {
+              streak++;
+              if (streak >= 3) streakDisplay.style.display = 'inline';
+            } else {
+              streak = 0;
+              streakDisplay.style.display = 'none';
+            }
+            // Badge 60min
+            if (!antiCheatTriggered && questDuration >= 60) lastQuest60 = true;
+            else lastQuest60 = false;
+            // Badge 90min
+            if (!antiCheatTriggered && questDuration >= 90) lastQuest90 = true;
+            else lastQuest90 = false;
+            // Gain ressources (X2 si streak)
+            let gain = 1;
+            if (streak >= 3) gain = 2;
+            resourceCount += gain;
+            resourceDisplay.textContent = resourceCount;
+            // Animation ressource
+            resourceDisplay.animate([
+              { transform: 'scale(1)', color: '#fff' },
+              { transform: 'scale(1.4)', color: 'var(--neon-color,#ffd700)' },
+              { transform: 'scale(1)', color: '#fff' }
+            ], { duration: 600 });
+            // Victoire
+            showVictory(gain);
+          }
+        }, 1000);
       }
     }, 1000);
-  }
-
-  function showVictory(gain) {
-    victory.style.display = 'flex';
-    // Déblocage du badge Premier Pas si session réussie sans triche
-    if (!antiCheatTriggered && resourceCount >= 1) {
-      userBadges['badge1'] = true;
-    }
-    // Progression : update badges/rank
-    updateProgression();
     // Ajout bouton copier succès
     if (!document.getElementById('copyBtn')) {
       let btn = document.createElement('button');
