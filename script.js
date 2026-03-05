@@ -363,6 +363,7 @@ window.addEventListener('DOMContentLoaded', function() {
     localStorage.setItem('cjfc_resources', resourceCount);
     localStorage.setItem('cjfc_streak', streak);
     localStorage.setItem('cjfc_lastQuest60', lastQuest60?'1':'');
+    localStorage.setItem('cjfc_lastQuest90', lastQuest90?'1':'');
     localStorage.setItem('cjfc_kofi', kofiClicked?'1':'');
   }
   function loadProgression() {
@@ -372,6 +373,7 @@ window.addEventListener('DOMContentLoaded', function() {
       resourceCount = parseInt(localStorage.getItem('cjfc_resources'), 10) || 0;
       streak = parseInt(localStorage.getItem('cjfc_streak'), 10) || 0;
       lastQuest60 = !!localStorage.getItem('cjfc_lastQuest60');
+      lastQuest90 = !!localStorage.getItem('cjfc_lastQuest90');
       kofiClicked = !!localStorage.getItem('cjfc_kofi');
       resourceDisplay.textContent = resourceCount;
       if (streak >= 3) streakDisplay.style.display = 'inline';
@@ -380,6 +382,7 @@ window.addEventListener('DOMContentLoaded', function() {
       userRank = 0;
       streak = 0;
       lastQuest60 = false;
+      lastQuest90 = false;
       kofiClicked = false;
     }
     renderRank();
