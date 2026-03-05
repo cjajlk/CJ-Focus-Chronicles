@@ -224,6 +224,20 @@ window.addEventListener('DOMContentLoaded', function() {
       victory.querySelector('.victory-inner').appendChild(btn);
     }
   }
+
+  function showVictory(gain) {
+    const victoryContent = victory.querySelector('.victory-content');
+    if (victoryContent) {
+      if (gain > 1) {
+        victoryContent.textContent = `Bravo, tu as gagné ${gain} ressources ! 🔥 Streak X2`;
+      } else {
+        victoryContent.textContent = `Bravo, tu as gagné ${gain} ressource !`;
+      }
+    }
+    updateProgression();
+    victory.style.display = 'flex';
+  }
+
   victoryClose.addEventListener('click', () => {
     victory.style.display = 'none';
     resetTimer();

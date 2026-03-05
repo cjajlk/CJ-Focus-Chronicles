@@ -203,24 +203,26 @@ h1 {
 }
 
 .badge-share-btn {
-  background: linear-gradient(90deg, var(--neon-color,#00ffe7) 0%, #00bfff 100%) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 10px !important;
-  padding: 0.4rem 1.2rem !important;
-  font-size: 1rem !important;
-  font-weight: bold !important;
+  background: rgba(0,255,231,0.1) !important;
+  color: var(--neon-color,#00ffe7) !important;
+  border: 1px solid var(--neon-color,#00ffe7) !important;
+  border-radius: 999px !important;
+  padding: 0.14rem 0.52rem !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
   cursor: pointer !important;
-  box-shadow: 0 0 12px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset !important;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s !important;
-  margin-left: 0.5rem !important;
+  box-shadow: none !important;
+  transition: background 0.18s, color 0.18s, border-color 0.18s !important;
+  margin-left: 0.3rem !important;
   display: inline-block !important;
+  line-height: 1.1 !important;
 }
 
 .badge-share-btn:hover {
-  background: linear-gradient(90deg, #00bfff 0%, var(--neon-color,#00ffe7) 100%) !important;
+  background: rgba(0,255,231,0.18) !important;
   color: #fff !important;
-  box-shadow: 0 0 18px var(--neon-color,#00ffe7) !important;
+  border-color: #9ffef3 !important;
+  box-shadow: none !important;
 }
 @media (max-width: 600px) {
   html, body {
