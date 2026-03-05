@@ -62,10 +62,12 @@ window.addEventListener('DOMContentLoaded', function() {
     function showLockOverlay() {
       if (lockOverlay) lockOverlay.style.display = 'flex';
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('lock-active');
     }
     function hideLockOverlay() {
       if (lockOverlay) lockOverlay.style.display = 'none';
       document.body.style.overflow = '';
+      document.body.classList.remove('lock-active');
     }
     function stopSessionAndLose() {
       running = false;
@@ -164,56 +166,47 @@ window.addEventListener('DOMContentLoaded', function() {
     alertBox.style.display = 'none';
     antiCheatTriggered = false;
     miner.classList.add('mining');
+    requestWakeLock();
+    showLockOverlay();
     timerInterval = setInterval(() => {
       if (remainingSeconds > 0) {
-        if (running) return;
-        running = true;
-        startBtn.disabled = true;
-        alertBox.style.display = 'none';
-        antiCheatTriggered = false;
-        miner.classList.add('mining');
-        showLockOverlay();
-        timerInterval = setInterval(() => {
-          if (remainingSeconds > 0) {
-            remainingSeconds--;
-            updateTimerDisplay();
-          } else {
-            clearInterval(timerInterval);
-            running = false;
-            startBtn.disabled = false;
-            miner.classList.remove('mining');
-            releaseWakeLock();
-            hideLockOverlay();
-            let questDuration = totalSeconds / 60;
-            // --- Streak & badges ---
-            if (!antiCheatTriggered) {
-              streak++;
-              if (streak >= 3) streakDisplay.style.display = 'inline';
-            } else {
-              streak = 0;
-              streakDisplay.style.display = 'none';
-            }
-            // Badge 60min
-            if (!antiCheatTriggered && questDuration >= 60) lastQuest60 = true;
-            else lastQuest60 = false;
-            // Badge 90min
-            if (!antiCheatTriggered && questDuration >= 90) lastQuest90 = true;
-            else lastQuest90 = false;
-            // Gain ressources (X2 si streak)
-            let gain = 1;
-            if (streak >= 3) gain = 2;
-            resourceCount += gain;
-            resourceDisplay.textContent = resourceCount;
-            // Animation ressource
-            resourceDisplay.animate([
-              { transform: 'scale(1)', color: '#fff' },
-              { transform: 'scale(1.4)', color: 'var(--neon-color,#ffd700)' },
-              { transform: 'scale(1)', color: '#fff' }
-            ], { duration: 600 });
-            // Victoire
-            showVictory(gain);
-          }
-        }, 1000);
+        remainingSeconds--;
+        updateTimerDisplay();
+      } else {
+        clearInterval(timerInterval);
+        running = false;
+        startBtn.disabled = false;
+        miner.classList.remove('mining');
+        releaseWakeLock();
+        hideLockOverlay();
+        let questDuration = totalSeconds / 60;
+        // --- Streak & badges ---
+        if (!antiCheatTriggered) {
+          streak++;
+          if (streak >= 3) streakDisplay.style.display = 'inline';
+        } else {
+          streak = 0;
+          streakDisplay.style.display = 'none';
+        }
+        // Badge 60min
+        if (!antiCheatTriggered && questDuration >= 60) lastQuest60 = true;
+        else lastQuest60 = false;
+        // Badge 90min
+        if (!antiCheatTriggered && questDuration >= 90) lastQuest90 = true;
+        else lastQuest90 = false;
+        // Gain ressources (X2 si streak)
+        let gain = 1;
+        if (streak >= 3) gain = 2;
+        resourceCount += gain;
+        resourceDisplay.textContent = resourceCount;
+        // Animation ressource
+        resourceDisplay.animate([
+          { transform: 'scale(1)', color: '#fff' },
+          { transform: 'scale(1.4)', color: 'var(--neon-color,#ffd700)' },
+          { transform: 'scale(1)', color: '#fff' }
+        ], { duration: 600 });
+        // Victoire
+        showVictory(gain);
       }
     }, 1000);
     // Ajout bouton copier succès

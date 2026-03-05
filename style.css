@@ -198,29 +198,29 @@ h1 {
   transition: background 0.2s, color 0.2s;
 }
 .victory .victory-btn:hover {
-  /* Style bouton partager badge */
-  .badge-share-btn {
-    background: linear-gradient(90deg, var(--neon-color,#00ffe7) 0%, #00bfff 100%) !important;
-    color: #fff !important;
-    border: none !important;
-    border-radius: 10px !important;
-    padding: 0.4rem 1.2rem !important;
-    font-size: 1rem !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    box-shadow: 0 0 12px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset !important;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s !important;
-    margin-left: 0.5rem !important;
-    display: inline-block !important;
-  }
-  }
-  .badge-share-btn:hover {
-    background: linear-gradient(90deg, #00bfff 0%, var(--neon-color,#00ffe7) 100%) !important;
-    color: #fff !important;
-    box-shadow: 0 0 18px var(--neon-color,#00ffe7) !important;
-  }
   background: linear-gradient(90deg, #00bfff 0%, #00ffe7 100%);
   color: #fff;
+}
+
+.badge-share-btn {
+  background: linear-gradient(90deg, var(--neon-color,#00ffe7) 0%, #00bfff 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 0.4rem 1.2rem !important;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 12px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s !important;
+  margin-left: 0.5rem !important;
+  display: inline-block !important;
+}
+
+.badge-share-btn:hover {
+  background: linear-gradient(90deg, #00bfff 0%, var(--neon-color,#00ffe7) 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 0 18px var(--neon-color,#00ffe7) !important;
 }
 @media (max-width: 600px) {
   html, body {
@@ -250,21 +250,6 @@ h1 {
     width: 54px;
     height: 54px;
     margin-bottom: 0.2rem;
-  }
-    margin-top: 1rem;
-    background: linear-gradient(90deg, var(--neon-color,#00ffe7) 0%, #00bfff 100%);
-    color: #181c24;
-    border: none;
-    border-radius: 10px;
-    padding: 0.7rem 2.2rem;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 0 12px var(--neon-color,#00ffe7), 0 0 0 2px var(--neon-color,#00ffe7) inset;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-    margin-right: 0.7rem;
-    display: inline-block;
-    margin-bottom: 0.1rem;
   }
   .controls button {
       border: none;
@@ -406,4 +391,157 @@ h1 {
   background: var(--neon-color,#00ffe7);
   color: #181c24;
   box-shadow: 0 0 24px var(--neon-color,#00ffe7);
+}
+
+.lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem;
+  background: radial-gradient(circle at 50% 30%, rgba(0,255,231,0.08), rgba(0,0,0,0.94) 60%);
+  backdrop-filter: blur(2px);
+  animation: lockFadeIn 260ms ease-out;
+}
+
+.lock-card {
+  width: min(92vw, 560px);
+  text-align: center;
+  color: #fff;
+  background: rgba(24, 28, 36, 0.96);
+  border: 1px solid color-mix(in srgb, var(--neon-color,#00ffe7) 45%, transparent);
+  border-radius: 18px;
+  padding: 1.4rem 1.1rem 1.1rem;
+  box-shadow: 0 0 28px color-mix(in srgb, var(--neon-color,#00ffe7) 45%, transparent), 0 0 0 1px rgba(255,255,255,0.07) inset;
+  animation: lockCardPop 320ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+.lock-mining-scene {
+  position: relative;
+  width: min(86vw, 230px);
+  height: 86px;
+  margin: 0.25rem auto 0.85rem;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.18));
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset;
+  overflow: hidden;
+}
+
+.lock-pickaxe {
+  position: absolute;
+  left: 58px;
+  top: 8px;
+  font-size: 2rem;
+  transform-origin: 80% 82%;
+  animation: lockPickaxeHit 0.75s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
+}
+
+.lock-rock {
+  position: absolute;
+  right: 42px;
+  bottom: 13px;
+  font-size: 2rem;
+  animation: lockRockShake 0.75s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.45));
+}
+
+.lock-spark {
+  position: absolute;
+  color: #ffd27a;
+  opacity: 0;
+  text-shadow: 0 0 8px rgba(255,210,122,0.8);
+}
+
+.lock-spark-1 {
+  right: 88px;
+  top: 28px;
+  animation: lockSpark 0.75s ease-out infinite;
+}
+
+.lock-spark-2 {
+  right: 72px;
+  top: 18px;
+  animation: lockSpark 0.75s ease-out 0.09s infinite;
+}
+
+.lock-title {
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
+  font-weight: 700;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--neon-color,#00ffe7) 40%, transparent);
+  margin-bottom: 0.55rem;
+}
+
+.lock-subtitle {
+  font-size: clamp(0.9rem, 1.9vw, 1rem);
+  color: #d7dde8;
+  line-height: 1.45;
+  margin-bottom: 1rem;
+}
+
+.lock-unlock-btn {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #ff4d4d 0%, #ff6b6b 100%);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.85rem 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255,77,77,0.35), 0 0 0 1px rgba(255,255,255,0.15) inset;
+  transition: transform 0.16s ease, filter 0.16s ease, box-shadow 0.16s ease;
+  animation: lockPulse 2.3s ease-in-out infinite;
+}
+
+.lock-unlock-btn:hover {
+  transform: translateY(-1px) scale(1.01);
+  filter: brightness(1.04);
+  box-shadow: 0 12px 28px rgba(255,77,77,0.42), 0 0 0 1px rgba(255,255,255,0.2) inset;
+}
+
+.lock-unlock-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+@keyframes lockFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes lockCardPop {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes lockPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(255,77,77,0.35), 0 0 0 1px rgba(255,255,255,0.15) inset; }
+  50% { box-shadow: 0 12px 30px rgba(255,77,77,0.5), 0 0 0 1px rgba(255,255,255,0.24) inset; }
+}
+
+@keyframes lockPickaxeHit {
+  0% { transform: rotate(-26deg) translate(0, 0); }
+  38% { transform: rotate(16deg) translate(10px, 10px); }
+  46% { transform: rotate(24deg) translate(13px, 13px); }
+  100% { transform: rotate(-26deg) translate(0, 0); }
+}
+
+@keyframes lockRockShake {
+  0%, 34%, 100% { transform: translateX(0); }
+  40% { transform: translateX(2px) rotate(-3deg); }
+  47% { transform: translateX(-2px) rotate(2deg); }
+  55% { transform: translateX(1px); }
+}
+
+@keyframes lockSpark {
+  0%, 35%, 100% { opacity: 0; transform: translate(0, 0) scale(0.7); }
+  45% { opacity: 1; transform: translate(2px, -4px) scale(1); }
+  62% { opacity: 0; transform: translate(8px, -9px) scale(1.05); }
+}
+
+body.lock-active #mainContainer {
+  filter: blur(0.6px) brightness(0.58);
+  transform: scale(0.995);
+  transition: filter 0.25s ease, transform 0.25s ease;
 }

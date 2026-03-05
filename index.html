@@ -52,12 +52,10 @@
   </div>
   <div id="rankUpAnim" class="rankup-anim" style="display:none;"></div>
   <a class="hub-link" href="https://cjajlk.github.io/cjajlkGames/" target="_blank" rel="noopener">🌐 Voir tous mes jeux</a>
-  <script src="script.js"></script>
   <footer style="margin-top:3em;padding:1.2em 0 0.7em 0;text-align:center;font-size:0.98em;color:#888;background:none;letter-spacing:0.01em;user-select:none;">
     <span style="font-weight:700;color:#ffd700;text-shadow:0 1px 4px #000b;">© CJAjlk</span> — <span style="color:#bbb;">Tous droits réservés.</span><br>
     <span style="font-size:0.97em;color:#b55;">Reproduction ou copie interdite.</span>
   </footer>
-</body>
   <!-- Message d'avertissement sauvegarde locale -->
   <!-- Icône info sauvegarde locale -->
   <div id="localSaveInfo" style="margin:2em auto 1em auto;max-width:600px;text-align:center;">
@@ -67,13 +65,20 @@
       <span style="color:#444;font-weight:400;">Si vous effacez les données de navigation ou changez d'appareil, votre progression sera perdue.</span>
     </div>
   </div>
-</html>
-<!-- Overlay de verrouillage -->
-<div id="lockOverlay" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.92);color:#fff;align-items:center;justify-content:center;flex-direction:column;font-size:1.3em;">
-  <div style="margin-bottom:2em;text-align:center;">
-    <span>Session en cours : écran verrouillé</span><br>
-    <small>Pour débloquer en cas d'urgence, cliquez ci-dessous (la session sera perdue)</small>
+  <!-- Overlay de verrouillage -->
+  <div id="lockOverlay" class="lock-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Session verrouillée">
+    <div class="lock-card">
+      <div class="lock-title">Session en cours : écran verrouillé</div>
+      <div class="lock-mining-scene" aria-hidden="true">
+        <span class="lock-pickaxe">⛏️</span>
+        <span class="lock-rock">🪨</span>
+        <span class="lock-spark lock-spark-1">✦</span>
+        <span class="lock-spark lock-spark-2">✦</span>
+      </div>
+      <div class="lock-subtitle">Pour débloquer en cas d'urgence, cliquez ci-dessous (la session sera perdue)</div>
+      <button id="unlockBtn" class="lock-unlock-btn">Débloquer (urgence)</button>
+    </div>
   </div>
-  <button id="unlockBtn" style="padding:1em 2em;font-size:1.1em;background:#ff4444;color:#fff;border:none;border-radius:8px;cursor:pointer;">Débloquer (urgence)</button>
-</div>
+  <script src="script.js"></script>
+</body>
 </html>
