@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CJ Focus Chronicles - Productivité RPG</title>
+    <link rel="stylesheet" href="lock-overlay.css">
     <style>
         :root {
             --neon-color: #00ffe7;
+        }
+        * {
+            box-sizing: border-box;
         }
         body {
             background: #181c24;
             color: #e0e0e0;
             font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
+            padding: 0 0.7rem 1rem;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -30,7 +35,7 @@
             align-items: center;
             gap: 2rem;
             max-width: 370px;
-            width: 95vw;
+            width: min(95vw, 370px);
         }
         h1 {
             font-size: 2.2rem;
@@ -68,6 +73,9 @@
             display: flex;
             gap: 0.5rem;
             align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
         }
         .controls input[type="number"] {
             width: 60px;
@@ -96,6 +104,25 @@
         .controls button:hover {
             background: linear-gradient(90deg, #00bfff 0%, var(--neon-color) 100%);
             color: #fff;
+        }
+        .copy-btn {
+            margin: 1.1rem auto 0;
+            display: inline-block;
+            background: linear-gradient(90deg, var(--neon-color) 0%, #00bfff 100%);
+            color: #181c24;
+            border: none;
+            border-radius: 10px;
+            padding: 0.48rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-color);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .copy-btn:hover {
+            background: linear-gradient(90deg, #00bfff 0%, var(--neon-color) 100%);
+            color: #fff;
+            box-shadow: 0 0 16px var(--neon-color);
         }
         .diamonds {
             display: flex;
@@ -164,18 +191,43 @@
             margin-top: 1.5rem;
             width: 100%;
         }
-        .badges-section h2 {
-            font-size: 1.1rem;
-            color: var(--neon-color);
-            text-shadow: 0 0 8px var(--neon-color);
-            margin: 0 0 0.5rem 0;
+        #badgesAccordion {
+            width: 100%;
+            margin: 0.1rem 0 0.2rem 0;
+            border-radius: 10px;
+            background: rgba(24,28,36,0.98);
+            box-shadow: 0 0 8px var(--neon-color) inset;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        #badgesAccordion summary {
+            font-size: 1rem;
+            padding: 0.55rem 0.4rem;
+            outline: none;
+            cursor: pointer;
+            border-radius: 8px;
+            background: none;
+            user-select: none;
             text-align: center;
+            color: var(--neon-color);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #222a;
+            transition: background 0.2s;
+        }
+        #badgesAccordion[open] summary {
+            background: rgba(0,255,231,0.08);
+        }
+        #badgesAccordion:not([open]) #badgesList {
+            display: none;
         }
         #badgesList {
             display: flex;
             gap: 1.2rem;
             justify-content: center;
             align-items: center;
+            flex-wrap: wrap;
+            row-gap: 0.8rem;
         }
         .badge-ico {
             font-size: 2rem;
@@ -230,19 +282,55 @@
         }
         @media (max-width: 600px) {
             #app-container {
-                max-width: 98vw;
-                padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+                width: 100%;
+                max-width: 420px;
+                margin-top: 1rem;
+                padding: 1.05rem 0.7rem 1.2rem;
+                gap: 1.2rem;
+            }
+            h1 {
+                font-size: 1.65rem;
+                text-align: center;
+            }
+            .timer {
+                font-size: 2.35rem;
+            }
+            .controls {
+                gap: 0.45rem;
+            }
+            .controls input[type="number"] {
+                width: 56px;
+                font-size: 1rem;
+            }
+            .controls button {
+                font-size: 0.98rem;
+                padding: 0.48rem 0.82rem;
+            }
+            .resources,
+            .diamonds,
+            .rank-section {
+                font-size: 1rem;
+                text-align: center;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            #badgesList {
+                gap: 0.8rem;
             }
             .kofi-btn {
-                font-size: 1.2rem;
-                padding: 1.2rem 0;
-                border-radius: 16px;
-                max-width: 100vw;
+                font-size: 1rem;
+                padding: 0.9rem 0;
+                border-radius: 14px;
+                max-width: 100%;
             }
             .miner {
                 font-size: 2.5rem;
                 height: 3.2rem;
                 width: 3.2rem;
+            }
+            .hub-link {
+                max-width: 100%;
+                font-size: 1rem;
             }
         }
     </style>
@@ -256,6 +344,19 @@
             🚀 Retour vers CJajlkGames
         </a>
     </footer>
+    <div id="lockOverlay" class="lock-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Session verrouillée">
+        <div class="lock-card">
+            <div class="lock-title">Session en cours : écran verrouillé</div>
+            <div class="lock-mining-scene" aria-hidden="true">
+                <span class="lock-pickaxe">⛏️</span>
+                <span class="lock-rock">🪨</span>
+                <span class="lock-spark lock-spark-1">✦</span>
+                <span class="lock-spark lock-spark-2">✦</span>
+            </div>
+            <div class="lock-subtitle">Pour débloquer en cas d'urgence, cliquez ci-dessous (la session sera perdue)</div>
+            <button id="unlockBtn" class="lock-unlock-btn">Débloquer (urgence)</button>
+        </div>
+    </div>
     <audio id="coinSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9bfae2.mp3" preload="auto"></audio>
     <div id="rankUpAnim" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;align-items:center;justify-content:center;background:rgba(24,28,36,0.96);flex-direction:column;"></div>
     <div id="copySuccess" style="display:none;position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:1rem 2rem;border-radius:16px;box-shadow:0 0 16px #00ffe7;font-size:1.1rem;z-index:3000;text-align:center;">Succès copié !</div>
@@ -271,14 +372,20 @@
         const badges = [
             { id: "badge1", label: "Premier Pas", icon: "🌱", tooltip: "Terminer sa toute première session de focus.", check: (r, s) => r >= 1 },
             { id: "badgeStreak", label: "Série de Feu", icon: "🔥", tooltip: "Réussir 3 sessions de focus d'affilée sans aucune triche.", check: (r, s) => s >= 3 },
+            { id: "badge10", label: "Routine Installée", icon: "🧩", tooltip: "Atteindre 10 ressources.", check: (r) => r >= 10 },
+            { id: "badge30", label: "Focus Pro", icon: "💼", tooltip: "Atteindre 30 ressources.", check: (r) => r >= 30 },
+            { id: "badge50", label: "Machine à Focus", icon: "🤖", tooltip: "Atteindre 50 ressources.", check: (r) => r >= 50 },
+            { id: "badge100", label: "Légende du Focus", icon: "👑", tooltip: "Atteindre 100 ressources pour débloquer ce badge ultime.", check: (r) => r >= 100 },
             { id: "badge60min", label: "L'Indestructible", icon: "🛡️", tooltip: "Finir une quête de 60 minutes sans quitter l'écran une seule fois.", check: (r, s, l) => l.lastQuest60 },
-            { id: "badgeLegend", label: "Légende de CJ", icon: "👑", tooltip: "Atteindre le rang maximum de progression.", check: (r, s, l) => l.rank === ranks.length - 1 },
+            { id: "badgeLong", label: "Marathonien", icon: "🏅", tooltip: "Terminer une session de 90 minutes ou plus.", check: (r, s, l) => l.lastQuest90 },
+            { id: "badgeStreak10", label: "Inarrêtable", icon: "🚀", tooltip: "Atteindre une série de 10 sessions réussies sans triche.", check: (r, s) => s >= 10 },
             { id: "badgeKofi", label: "Soutien Élite", icon: "☕", tooltip: "Cliquer sur le bouton Ko-fi pour soutenir le créateur.", check: (r, s, l) => l.kofi },
         ];
         let userBadges = {};
         let userRank = 0;
         let streak = 0;
         let lastQuest60 = false;
+        let lastQuest90 = false;
         let kofiClicked = false;
         let diamondCount = 0;
         let resourceCount = 0;
@@ -314,8 +421,10 @@
             <a class="kofi-btn" id="kofiBtn" href="https://ko-fi.com/cjajlk" target="_blank">☕ Faire un don sur Ko-fi</a>
             <div class="alert" id="alert">⚠️ Ne quittez pas l'onglet ou l'application ! Le timer est remis à zéro.</div>
             <div class="badges-section" id="badgesSection">
-                <h2>Mes Badges</h2>
-                <div id="badgesList"></div>
+                <details id="badgesAccordion" open>
+                    <summary>🎖️ Badges</summary>
+                    <div id="badgesList"></div>
+                </details>
             </div>
         `;
         // --- Sélecteurs ---
@@ -334,6 +443,41 @@
         const kofiBtn = document.getElementById('kofiBtn');
         const rankUpAnim = document.getElementById('rankUpAnim');
         const copySuccess = document.getElementById('copySuccess');
+        const lockOverlay = document.getElementById('lockOverlay');
+        const unlockBtn = document.getElementById('unlockBtn');
+
+        function showLockOverlay() {
+            if (lockOverlay) lockOverlay.style.display = 'flex';
+            document.body.classList.add('lock-active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideLockOverlay() {
+            if (lockOverlay) lockOverlay.style.display = 'none';
+            document.body.classList.remove('lock-active');
+            document.body.style.overflow = '';
+        }
+
+        function stopSessionAndLose() {
+            running = false;
+            clearInterval(timerInterval);
+            hideLockOverlay();
+            alertBox.textContent = "Session annulée : écran débloqué avant la fin.";
+            alertBox.style.display = 'block';
+            streak = 0;
+            streakDisplay.style.display = 'none';
+            miner.classList.remove('mining');
+            startBtn.disabled = false;
+        }
+
+        if (unlockBtn) {
+            unlockBtn.addEventListener('click', stopSessionAndLose);
+        }
+
+        if (window.innerWidth <= 600) {
+            const accordion = document.getElementById('badgesAccordion');
+            if (accordion) accordion.removeAttribute('open');
+        }
         // --- Fonctions ---
         function updateTimerDisplay() {
             const min = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
@@ -351,6 +495,8 @@
             alertBox.style.display = 'none';
             antiCheatTriggered = false;
             lastQuest60 = false;
+            lastQuest90 = false;
+            hideLockOverlay();
         }
         function startTimer() {
             if (running) return;
@@ -359,6 +505,7 @@
             alertBox.style.display = 'none';
             antiCheatTriggered = false;
             miner.classList.add('mining');
+            showLockOverlay();
             timerInterval = setInterval(() => {
                 if (remainingSeconds > 0) {
                     remainingSeconds--;
@@ -368,6 +515,7 @@
                     running = false;
                     startBtn.disabled = false;
                     miner.classList.remove('mining');
+                    hideLockOverlay();
                     diamondCount++;
                     let questDuration = totalSeconds / 60;
                     // --- Streak & badges ---
@@ -381,6 +529,9 @@
                     // Badge 60min
                     if (!antiCheatTriggered && questDuration >= 60) lastQuest60 = true;
                     else lastQuest60 = false;
+                    // Badge 90min
+                    if (!antiCheatTriggered && questDuration >= 90) lastQuest90 = true;
+                    else lastQuest90 = false;
                     // Gain ressources (X2 si streak)
                     let gain = 1;
                     if (streak >= 3) gain = 2;
@@ -411,10 +562,8 @@
             if (!document.getElementById('copyBtn')) {
                 let btn = document.createElement('button');
                 btn.id = 'copyBtn';
-                btn.className = 'controls';
+                btn.className = 'copy-btn';
                 btn.innerText = 'Copier mon succès';
-                btn.style.margin = '1.2rem auto 0 auto';
-                btn.style.display = 'block';
                 btn.onclick = function() {
                     let txt = `🔥 J'ai réussi ${resourceCount} quêtes sur CJ Focus Chronicles ! Rang : ${ranks[userRank].name}${streak>=3?' (Streak X2!)':''} 💎 https://cjajlk.github.io/cjajlkGames/`;
                     navigator.clipboard.writeText(txt);
@@ -434,7 +583,7 @@
         function updateProgression() {
             // Badges
             for (const badge of badges) {
-                if (badge.check(resourceCount, streak, {lastQuest60, rank:userRank, kofi:kofiClicked})) {
+                if (badge.check(resourceCount, streak, {lastQuest60, lastQuest90, rank:userRank, kofi:kofiClicked})) {
                     userBadges[badge.id] = true;
                 }
             }
@@ -492,6 +641,7 @@
             localStorage.setItem('cjfc_resources', resourceCount);
             localStorage.setItem('cjfc_streak', streak);
             localStorage.setItem('cjfc_lastQuest60', lastQuest60?'1':'');
+            localStorage.setItem('cjfc_lastQuest90', lastQuest90?'1':'');
             localStorage.setItem('cjfc_kofi', kofiClicked?'1':'');
         }
         function loadProgression() {
@@ -501,6 +651,7 @@
                 resourceCount = parseInt(localStorage.getItem('cjfc_resources'), 10) || 0;
                 streak = parseInt(localStorage.getItem('cjfc_streak'), 10) || 0;
                 lastQuest60 = !!localStorage.getItem('cjfc_lastQuest60');
+                lastQuest90 = !!localStorage.getItem('cjfc_lastQuest90');
                 kofiClicked = !!localStorage.getItem('cjfc_kofi');
                 resourceDisplay.textContent = resourceCount;
                 if (streak >= 3) streakDisplay.style.display = 'inline';
@@ -509,6 +660,7 @@
                 userRank = 0;
                 streak = 0;
                 lastQuest60 = false;
+                lastQuest90 = false;
                 kofiClicked = false;
             }
             renderRank();
@@ -555,6 +707,7 @@
                 antiCheatTriggered = true;
                 streak = 0;
                 streakDisplay.style.display = 'none';
+                hideLockOverlay();
             }
         }
         document.addEventListener('visibilitychange', () => {
